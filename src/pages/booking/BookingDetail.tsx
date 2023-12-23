@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
 import axios from "api/index"
+import { toPasalCase } from "helpers/usePascalCase"
 import { Booking } from "utilities/data_types"
 
 import Card from "components/Card"
@@ -37,8 +38,14 @@ const BookingDetail = () => {
       setCancelBookingLoading(true)
 
       const resp = await axios.delete(`/user/bookings/${bookingId}`)
-      alert(resp.data.message)
+
       setCancelBookingLoading(false)
+      alert(resp.data.message)
+
+      if ("booking_status" in resp.data) {
+        return
+      }
+
       navigate("/bookings", {
         replace: true
       })
@@ -76,17 +83,24 @@ const BookingDetail = () => {
         <Heading1>Booking Information</Heading1>
 
         {!loading && (
-          <div className="flex w-1/2 items-start gap-x-3">
-            <PrimaryButton
-              type="button"
-              loading={cancelBookingLoading}
-              onClick={cancelBooking}
-            >
-              Cancel Booking
-            </PrimaryButton>
+          <div className="flex w-1/2 gap-x-3">
+            {bookingInfo?.bus_departure.departure_status === "not_started" && (
+              <PrimaryButton
+                type="button"
+                loading={cancelBookingLoading}
+                onClick={cancelBooking}
+              >
+                Cancel Booking
+              </PrimaryButton>
+            )}
 
             <PrimaryButton
               type="button"
+              className={`${
+                bookingInfo?.bus_departure.departure_status !== "not_started"
+                  ? "!w-1/2"
+                  : ""
+              } ml-auto`.trimStart()}
               loading={downloadInvoiceLoading}
               onClick={downloadInvoice}
             >
@@ -147,6 +161,11 @@ const BookingDetail = () => {
               minute: "numeric",
               hour12: true
             }).format(new Date(bookingInfo.created_at))}
+          </div>
+
+          <div>
+            <div className="font-semibold">Departure Status</div>
+            {toPasalCase(bookingInfo.bus_departure.departure_status)}
           </div>
 
           <div>

@@ -13,10 +13,12 @@ import BookingDetail from "pages/booking/BookingDetail"
 import Payment from "pages/payment/Payment"
 import BookingPayment from "pages/payment/BookingPayment"
 import Profile from "pages/profile/Profile"
+import ErrorPage from "pages/ErrorPage"
 
 export const router = createBrowserRouter([
   {
     element: <App />,
+    // errorElement: <ErrorPage />,
     children: [
       {
         element: <GuestLayout />,
